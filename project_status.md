@@ -24,17 +24,18 @@ A voice-based health diary application deployed on AWS with AI-powered transcrip
 #### 3. Web Application Features
 - **Voice Recording**: WebRTC-based audio capture
 - **Real-time Feedback**: Visual status updates during recording
-- **Audio Playback**: Immediate playback of recorded audio
-- **File Download**: Timestamped .wav file downloads
-- **Mobile Responsive**: Works on iPhone/Android/Desktop
-- **Browser Compatibility**: Uses modern MediaRecorder API
+- **Audio Playback**: iOS-compatible playback with user gesture support
+- **File Download**: Timestamped audio file downloads (WAV/MP4/WebM)
+- **Mobile Responsive**: Full iPhone/Android/Desktop compatibility
+- **Browser Compatibility**: MediaRecorder API with iOS Safari support
 
 #### 4. Technical Implementation
 - **Frontend**: Vanilla JavaScript with WebRTC
 - **Styling**: CSS with gradients and animations
-- **Audio Format**: WAV files with timestamp naming
-- **File Naming**: `health-diary-YYYY-MM-DD-HH-MM-SS.wav`
-- **Error Handling**: Microphone permission checks
+- **Audio Formats**: Auto-detected (MP4/WebM/WAV) for device compatibility
+- **File Naming**: `health-diary-YYYY-MM-DD-HH-MM-SS.[ext]`
+- **Error Handling**: Microphone permissions + iOS audio restrictions
+- **iOS Compatibility**: User gesture requirements + format detection
 
 #### 5. SSL/TLS Security
 - **SSL Certificate**: Let's Encrypt (trusted by all browsers)
@@ -42,6 +43,7 @@ A voice-based health diary application deployed on AWS with AI-powered transcrip
 - **Auto-Renewal**: Cron job configured for 90-day renewal
 - **Mobile Compatibility**: Full HTTPS support for microphone access
 - **Security**: TLS 1.2/1.3, modern cipher suites
+- **Status**: ✅ Operational with proper port mapping (80→443)
 
 #### 6. Automated Deployment System
 - **One-Command Deployment**: Complete automation via `./deploy-simple.sh`
