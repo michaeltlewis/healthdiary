@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Diary</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+        p {
+            color: #666;
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        .status {
+            background: #e8f5e8;
+            color: #2d7d2d;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .features {
+            text-align: left;
+            margin: 30px 0;
+        }
+        .features ul {
+            list-style: none;
+            padding: 0;
+        }
+        .features li {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .features li:last-child {
+            border-bottom: none;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #999;
+        }
+        .recording-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+        }
+        .record-button, .download-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .record-button:hover, .download-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .record-button.recording {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .recording-status {
+            margin: 15px 0;
+            font-weight: bold;
+            color: #666;
+        }
+        .recording-status.recording {
+            color: #ff6b6b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Health Diary</h1>
+        <div class="status">
+            Infrastructure Successfully Deployed!
+        </div>
+        <p>Your Health Diary application infrastructure is now running on AWS with containerized deployment.</p>
+        
+        <div class="features">
+            <h3>Infrastructure Components:</h3>
+            <ul>
+                <li>VPC with public and private subnets</li>
+                <li>Application Load Balancer</li>
+                <li>ECS Fargate cluster</li>
+                <li>Auto-scaling and high availability</li>
+                <li>CloudWatch logging</li>
+            </ul>
+        </div>
+        
+        <div class="recording-section">
+            <h3>Record Your Health Diary Entry:</h3>
+            <button id="recordBtn" class="record-button">🎤 Start Recording</button>
+            <div id="status" class="recording-status"></div>
+            <audio id="audioPlayer" controls style="display: none; margin: 20px 0; width: 100%;"></audio>
+            <button id="downloadBtn" class="download-button" style="display: none;">💾 Download Recording</button>
+        </div>
+        
+        <div class="features">
+            <h3>Coming Soon:</h3>
+            <ul>
+                <li>AI-powered transcription</li>
+                <li>Health analysis</li>
+                <li>Secure user authentication</li>
+                <li>Personalized health tracking</li>
+            </ul>
+        </div>
+        
+        <div class="footer">
+            <p>Built with AWS, Terraform, and containerized deployment</p>
+        </div>
+    </div>
+    
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+        let isRecording = false;
+        
+        const recordBtn = document.getElementById('recordBtn');
+        const status = document.getElementById('status');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const downloadBtn = document.getElementById('downloadBtn');
+        
+        recordBtn.addEventListener('click', toggleRecording);
+        
+        async function toggleRecording() {
+            if (isRecording) {
+                stopRecording();
+            } else {
+                startRecording();
+            }
+        }
+        
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                
+                mediaRecorder.ondataavailable = event => {
+                    audioChunks.push(event.data);
+                };
+                
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    
+                    audioPlayer.src = audioUrl;
+                    audioPlayer.style.display = 'block';
+                    downloadBtn.style.display = 'inline-block';
+                    
+                    downloadBtn.onclick = () => {
+                        const a = document.createElement('a');
+                        a.href = audioUrl;
+                        a.download = `health-diary-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.wav`;
+                        a.click();
+                    };
+                    
+                    status.textContent = 'Recording saved! You can play it back or download it.';
+                    status.className = 'recording-status';
+                };
+                
+                mediaRecorder.start();
+                isRecording = true;
+                
+                recordBtn.textContent = '⏹️ Stop Recording';
+                recordBtn.className = 'record-button recording';
+                status.textContent = 'Recording... Speak now!';
+                status.className = 'recording-status recording';
+                
+                audioPlayer.style.display = 'none';
+                downloadBtn.style.display = 'none';
+                
+            } catch (error) {
+                console.error('Error accessing microphone:', error);
+                status.textContent = 'Error: Could not access microphone. Please check permissions.';
+                status.className = 'recording-status';
+            }
+        }
+        
+        function stopRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                
+                isRecording = false;
+                recordBtn.textContent = '🎤 Start Recording';
+                recordBtn.className = 'record-button';
+                status.textContent = 'Processing recording...';
+                status.className = 'recording-status';
+            }
+        }
+    </script>
+</body>
+</html>
