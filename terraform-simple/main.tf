@@ -97,7 +97,8 @@ resource "aws_key_pair" "healthdiary" {
 # User data script to install Docker and run the application
 locals {
   user_data = base64encode(templatefile("${path.module}/user_data.sh", {
-    container_image = "nginx:alpine"
+    duckdns_token     = var.duckdns_token
+    duckdns_subdomain = var.duckdns_subdomain
   }))
 }
 

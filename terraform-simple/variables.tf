@@ -15,3 +15,16 @@ variable "ssh_public_key" {
   type        = string
   default     = ""  # You'll need to provide this
 }
+
+variable "duckdns_token" {
+  description = "Duck DNS token for SSL certificate setup (optional)"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "duckdns_subdomain" {
+  description = "Duck DNS subdomain (without .duckdns.org) for SSL certificate (optional)"
+  type        = string
+  default     = ""
+}

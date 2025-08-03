@@ -5,6 +5,7 @@ set -e
 echo "Health Diary Simple AWS Deployment Script"
 echo "========================================"
 echo "This will deploy a single EC2 instance (~$5-10/month)"
+echo "Optional: SSL certificate support with Duck DNS"
 echo ""
 
 # Check if AWS CLI is configured
@@ -36,6 +37,17 @@ else
     echo "✓ SSH public key found"
 fi
 
+# Check for Duck DNS configuration (optional)
+DUCKDNS_VARS=""
+if [ -n "$DUCKDNS_TOKEN" ] && [ -n "$DUCKDNS_SUBDOMAIN" ]; then
+    DUCKDNS_VARS="-var duckdns_token=\"$DUCKDNS_TOKEN\" -var duckdns_subdomain=\"$DUCKDNS_SUBDOMAIN\""
+    echo "✓ Duck DNS configuration found - SSL certificate will be generated"
+    echo "  Domain: $DUCKDNS_SUBDOMAIN.duckdns.org"
+else
+    echo "ℹ️  Duck DNS not configured - deploying with HTTP only"
+    echo "  To enable SSL, set DUCKDNS_TOKEN and DUCKDNS_SUBDOMAIN environment variables"
+fi
+
 # Initialize Terraform
 echo "Initializing Terraform..."
 terraform init
@@ -46,8 +58,9 @@ terraform validate
 
 # Plan the deployment
 echo "Planning deployment..."
-if [ -n "$SSH_KEY_VAR" ]; then
-    eval "terraform plan $SSH_KEY_VAR -out=tfplan"
+TERRAFORM_VARS="$SSH_KEY_VAR $DUCKDNS_VARS"
+if [ -n "$TERRAFORM_VARS" ]; then
+    eval "terraform plan $TERRAFORM_VARS -out=tfplan"
 else
     terraform plan -out=tfplan
 fi
