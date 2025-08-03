@@ -3,7 +3,7 @@
 ## Project Overview
 A voice-based health diary application deployed on AWS with AI-powered transcription and analysis capabilities. The project follows a cost-optimized architecture targeting £5-10/month operational costs.
 
-## Current Status: ✅ Phase 1 Complete - Recording + SSL Certificate
+## Current Status: ✅ Phase 1 Complete - Full Production Deployment System
 
 ### ✅ Completed Components
 
@@ -43,6 +43,14 @@ A voice-based health diary application deployed on AWS with AI-powered transcrip
 - **Mobile Compatibility**: Full HTTPS support for microphone access
 - **Security**: TLS 1.2/1.3, modern cipher suites
 
+#### 6. Automated Deployment System
+- **One-Command Deployment**: Complete automation via `./deploy-simple.sh`
+- **SSL Auto-Configuration**: Duck DNS + Let's Encrypt integration
+- **GitHub Integration**: Automatic latest code deployment
+- **Environment Variables**: Configurable via DUCKDNS_TOKEN/DUCKDNS_SUBDOMAIN
+- **Update System**: Simple `./update.sh` for application updates
+- **Documentation**: Complete deployment guide with troubleshooting
+
 ### 📁 Project Structure
 ```
 healthdiary/
@@ -54,10 +62,11 @@ healthdiary/
 │   └── project_status.md          # This file
 ├── terraform-simple/             # Cost-optimized AWS deployment
 │   ├── main.tf                   # EC2 instance configuration
-│   ├── variables.tf              # Input variables
+│   ├── variables.tf              # Input variables (includes Duck DNS)
 │   ├── outputs.tf                # Instance IP/DNS outputs
-│   ├── user_data.sh              # Bootstrap script with Docker
-│   └── deploy-simple.sh          # Deployment automation
+│   ├── user_data.sh              # Complete bootstrap with SSL setup
+│   ├── deploy-simple.sh          # Full deployment automation
+│   └── README.md                 # Complete deployment guide
 ├── infrastructure/               # Complex deployment (unused)
 ├── _terraform/                   # ALB/ECS deployment (unused)
 ├── deploy.sh                     # Main deployment script
@@ -67,12 +76,23 @@ healthdiary/
 ```
 
 ### 🔧 Deployment Details
+
+#### Automated Deployment
+- **New Deployment**: `./deploy-simple.sh` (with environment variables)
+- **SSL Deployment**: Set `DUCKDNS_TOKEN` and `DUCKDNS_SUBDOMAIN` before running
+- **Updates**: SSH to server and run `sudo ./update.sh` (pulls latest from GitHub)
+
+#### Manual Access (if needed)
 - **SSH Access**: `ssh -i ~/.ssh/healthdiary-key ec2-user@18.130.249.186`
-- **Update Process**: 
-  1. Update local app/index.html
-  2. SCP file to server: `scp -i ~/.ssh/healthdiary-key app/index.html ec2-user@18.130.249.186:/tmp/new-index.html`
-  3. SSH and run: `sudo cp /tmp/new-index.html /opt/healthdiary/index.html && cd /opt/healthdiary && sudo ./update.sh`
-- **Container Management**: Docker container `healthdiary` runs nginx on port 80
+- **Container Management**: Docker container `healthdiary` on ports 80/443
+- **Logs**: `sudo docker logs healthdiary`
+
+#### Environment Variables for Deployment
+```bash
+export SSH_PUBLIC_KEY="$(cat ~/.ssh/id_rsa.pub)"
+export DUCKDNS_TOKEN="your-duckdns-token"      # Optional: for SSL
+export DUCKDNS_SUBDOMAIN="your-subdomain"      # Optional: for SSL
+```
 
 ## 🎯 Next Development Phases
 
@@ -162,6 +182,7 @@ healthdiary/
 ---
 
 **Last Updated**: 2025-08-03
-**Current Phase**: 1 (Recording + SSL) - Complete ✅
+**Current Phase**: 1 (Production Deployment System) - Complete ✅
 **Next Milestone**: Phase 2 (AI Integration)
 **Live URL**: https://healthdiary-app.duckdns.org
+**Deployment**: Fully automated via `./deploy-simple.sh`
