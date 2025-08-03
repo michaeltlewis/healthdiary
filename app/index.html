@@ -70,7 +70,7 @@
             border-radius: 15px;
             border: 2px solid #e9ecef;
         }
-        .record-button, .download-button {
+        .record-button, .download-button, .play-button {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
@@ -82,9 +82,12 @@
             margin: 10px;
             transition: transform 0.2s, box-shadow 0.2s;
         }
-        .record-button:hover, .download-button:hover {
+        .record-button:hover, .download-button:hover, .play-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .play-button {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
         }
         .record-button.recording {
             background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
@@ -128,7 +131,10 @@
             <h3>Record Your Health Diary Entry:</h3>
             <button id="recordBtn" class="record-button">🎤 Start Recording</button>
             <div id="status" class="recording-status"></div>
-            <audio id="audioPlayer" controls style="display: none; margin: 20px 0; width: 100%;"></audio>
+            <div id="playbackSection" style="display: none; margin: 20px 0;">
+                <button id="playBtn" class="play-button" style="display: none;">▶️ Play Recording</button>
+                <audio id="audioPlayer" controls style="display: none; margin: 10px 0; width: 100%;"></audio>
+            </div>
             <button id="downloadBtn" class="download-button" style="display: none;">💾 Download Recording</button>
         </div>
         
@@ -151,13 +157,60 @@
         let mediaRecorder;
         let audioChunks = [];
         let isRecording = false;
+        let currentAudioUrl = null;
         
         const recordBtn = document.getElementById('recordBtn');
         const status = document.getElementById('status');
         const audioPlayer = document.getElementById('audioPlayer');
         const downloadBtn = document.getElementById('downloadBtn');
+        const playBtn = document.getElementById('playBtn');
+        const playbackSection = document.getElementById('playbackSection');
         
         recordBtn.addEventListener('click', toggleRecording);
+        
+        function createPlayButton(audioUrl, mimeType) {
+            currentAudioUrl = audioUrl;
+            playBtn.style.display = 'inline-block';
+            playbackSection.style.display = 'block';
+            
+            // Remove old event listeners
+            playBtn.replaceWith(playBtn.cloneNode(true));
+            const newPlayBtn = document.getElementById('playBtn');
+            
+            newPlayBtn.addEventListener('click', function() {
+                playAudio(audioUrl);
+            });
+        }
+        
+        function playAudio(audioUrl) {
+            // For iOS compatibility, create a new audio element and play immediately
+            const audio = new Audio(audioUrl);
+            
+            // Show the native controls after user gesture
+            audioPlayer.style.display = 'block';
+            audioPlayer.src = audioUrl;
+            
+            // Try to play the audio
+            const playPromise = audio.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    status.textContent = 'Playing recording...';
+                    playBtn.textContent = '⏸️ Playing...';
+                    playBtn.disabled = true;
+                }).catch((error) => {
+                    console.log('Auto-play failed:', error);
+                    // Fallback: just show the controls
+                    status.textContent = 'Use the audio controls below to play the recording.';
+                });
+                
+                audio.addEventListener('ended', () => {
+                    playBtn.textContent = '▶️ Play Recording';
+                    playBtn.disabled = false;
+                    status.textContent = 'Recording saved! Click the play button to listen or download it.';
+                });
+            }
+        }
         
         async function toggleRecording() {
             if (isRecording) {
@@ -171,7 +224,17 @@
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 
-                mediaRecorder = new MediaRecorder(stream);
+                // Use compatible options for iOS
+                const options = {};
+                if (MediaRecorder.isTypeSupported('audio/mp4')) {
+                    options.mimeType = 'audio/mp4';
+                } else if (MediaRecorder.isTypeSupported('audio/webm')) {
+                    options.mimeType = 'audio/webm';
+                } else if (MediaRecorder.isTypeSupported('audio/wav')) {
+                    options.mimeType = 'audio/wav';
+                }
+                
+                mediaRecorder = new MediaRecorder(stream, options);
                 audioChunks = [];
                 
                 mediaRecorder.ondataavailable = event => {
@@ -179,21 +242,29 @@
                 };
                 
                 mediaRecorder.onstop = () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    const mimeType = mediaRecorder.mimeType || 'audio/wav';
+                    const audioBlob = new Blob(audioChunks, { type: mimeType });
                     const audioUrl = URL.createObjectURL(audioBlob);
                     
+                    // Set up audio player with iOS compatibility
                     audioPlayer.src = audioUrl;
+                    audioPlayer.preload = 'auto';
                     audioPlayer.style.display = 'block';
-                    downloadBtn.style.display = 'inline-block';
                     
+                    // Add play button for iOS user gesture requirement
+                    createPlayButton(audioUrl, mimeType);
+                    
+                    downloadBtn.style.display = 'inline-block';
                     downloadBtn.onclick = () => {
                         const a = document.createElement('a');
                         a.href = audioUrl;
-                        a.download = `health-diary-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.wav`;
+                        const extension = mimeType.includes('mp4') ? 'mp4' : 
+                                        mimeType.includes('webm') ? 'webm' : 'wav';
+                        a.download = `health-diary-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.${extension}`;
                         a.click();
                     };
                     
-                    status.textContent = 'Recording saved! You can play it back or download it.';
+                    status.textContent = 'Recording saved! Click the play button to listen or download it.';
                     status.className = 'recording-status';
                 };
                 
@@ -205,7 +276,9 @@
                 status.textContent = 'Recording... Speak now!';
                 status.className = 'recording-status recording';
                 
+                // Hide playback elements during recording
                 audioPlayer.style.display = 'none';
+                playbackSection.style.display = 'none';
                 downloadBtn.style.display = 'none';
                 
             } catch (error) {
