@@ -3,55 +3,69 @@
 ## Project Overview
 A voice-based health diary application deployed on AWS with AI-powered transcription and analysis capabilities. The project follows a cost-optimized architecture targeting £5-10/month operational costs.
 
-## Current Status: ✅ Phase 1 Complete - Full Production Deployment System
+## Current Status: ✅ Phase 2 Complete - AI-Powered Health Diary with Full Backend
 
 ### ✅ Completed Components
 
 #### 1. Infrastructure
 - **AWS Deployment**: Single t3.micro EC2 instance in eu-west-2 (London)
-- **Cost Target**: £5-10/month (vs enterprise £200-500/month)
+- **Cost Target**: £5-15/month (vs enterprise £200-500/month)
 - **Access URL**: https://healthdiary-app.duckdns.org
 - **Backup URL**: https://18.130.249.186 (self-signed cert)
 - **Domain**: healthdiary-app.duckdns.org → 18.130.249.186
-- **Deployment Method**: Docker containerized Nginx serving static HTML
+- **Deployment Method**: Docker containerized full-stack application with Nginx reverse proxy
 
-#### 2. Repository Setup
-- **GitHub Repository**: https://github.com/michaeltlewis/healthdiary (private)
-- **Local Path**: /home/ubuntu/projects/healthdiary
-- **Git Status**: All changes committed and pushed
-- **SSH Key**: ~/.ssh/healthdiary-key configured for server access
+#### 2. Backend API Server
+- **Framework**: Node.js with Express.js
+- **Authentication**: JWT-based user authentication system
+- **Database**: SQLite with encrypted file storage
+- **File Storage**: AWS S3 with server-side encryption
+- **Background Processing**: Automated job scheduler for AI services
+- **API Endpoints**: Complete REST API for user management and diary entries
 
-#### 3. Web Application Features
-- **Voice Recording**: WebRTC-based audio capture
-- **Real-time Feedback**: Visual status updates during recording
-- **Audio Playback**: iOS-compatible playback with user gesture support
-- **File Download**: Timestamped audio file downloads (WAV/MP4/WebM)
-- **Mobile Responsive**: Full iPhone/Android/Desktop compatibility
-- **Browser Compatibility**: MediaRecorder API with iOS Safari support
+#### 3. AI Integration Services
+- **Speech-to-Text**: Amazon Transcribe for audio transcription
+- **Health Analysis**: Anthropic Claude API for diary analysis
+- **Structured Data**: JSON-formatted health insights and trends
+- **Background Jobs**: Automated processing pipeline
+- **Confidence Scoring**: AI confidence levels for extracted data
 
-#### 4. Technical Implementation
-- **Frontend**: Vanilla JavaScript with WebRTC
-- **Styling**: CSS with gradients and animations
-- **Audio Formats**: Auto-detected (MP4/WebM/WAV) for device compatibility
-- **File Naming**: `health-diary-YYYY-MM-DD-HH-MM-SS.[ext]`
-- **Error Handling**: Microphone permissions + iOS audio restrictions
-- **iOS Compatibility**: User gesture requirements + format detection
+#### 4. User Management System
+- **Registration**: User signup with health preferences
+- **Authentication**: Secure login with JWT tokens
+- **Preferences**: Customizable interaction styles and health topics
+- **Data Export**: Complete user data export functionality
+- **Account Management**: Profile settings and account deletion
 
-#### 5. SSL/TLS Security
+#### 5. Health Diary Features
+- **Voice Recording**: Advanced WebRTC-based audio capture
+- **Audio Upload**: Secure S3 file storage with encryption
+- **Transcription**: Automatic speech-to-text via Amazon Transcribe
+- **Analysis**: AI-powered health insights and trend detection
+- **Data Visualization**: Structured display of health metrics
+- **Entry Management**: View, analyze, and manage diary entries
+
+#### 6. Frontend Application
+- **Modern UI**: Responsive design with mobile-first approach
+- **User Authentication**: Complete login/registration interface
+- **Real-time Updates**: Status tracking for processing jobs
+- **Audio Controls**: Cross-browser compatible recording and playback
+- **Entry Viewing**: Detailed modal interface for diary analysis
+- **Health Insights**: Visual presentation of AI analysis results
+
+#### 7. SSL/TLS Security
 - **SSL Certificate**: Let's Encrypt (trusted by all browsers)
 - **Domain**: healthdiary-app.duckdns.org
 - **Auto-Renewal**: Cron job configured for 90-day renewal
 - **Mobile Compatibility**: Full HTTPS support for microphone access
 - **Security**: TLS 1.2/1.3, modern cipher suites
-- **Status**: ✅ Operational with proper port mapping (80→443)
+- **Status**: ✅ Operational with Nginx reverse proxy
 
-#### 6. Automated Deployment System
-- **One-Command Deployment**: Complete automation via `./deploy-simple.sh`
-- **SSL Auto-Configuration**: Duck DNS + Let's Encrypt integration
-- **GitHub Integration**: Automatic latest code deployment
-- **Environment Variables**: Configurable via DUCKDNS_TOKEN/DUCKDNS_SUBDOMAIN
-- **Update System**: Simple `./update.sh` for application updates
-- **Documentation**: Complete deployment guide with troubleshooting
+#### 8. AWS IAM Integration
+- **EC2 Role**: Dedicated IAM role for application services
+- **S3 Permissions**: Automated bucket creation and management
+- **Transcribe Access**: Full access to Amazon Transcribe services
+- **Security**: Least-privilege access with encrypted storage
 
 ### 📁 Project Structure
 ```

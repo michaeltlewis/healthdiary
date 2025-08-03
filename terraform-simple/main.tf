@@ -94,6 +94,98 @@ resource "aws_key_pair" "healthdiary" {
   }
 }
 
+# IAM Role for EC2 Instance
+resource "aws_iam_role" "healthdiary_ec2_role" {
+  name = "healthdiary-ec2-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      }
+    ]
+  })
+
+  tags = {
+    Name = "healthdiary-ec2-role"
+  }
+}
+
+# IAM Policy for S3 and Transcribe access
+resource "aws_iam_policy" "healthdiary_ec2_policy" {
+  name = "healthdiary-ec2-policy"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:CreateBucket",
+          "s3:GetBucketLocation",
+          "s3:ListBucket",
+          "s3:ListAllMyBuckets"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:PutObjectAcl"
+        ]
+        Resource = "arn:aws:s3:::healthdiary-*/*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetBucketEncryption",
+          "s3:PutBucketEncryption",
+          "s3:GetBucketVersioning",
+          "s3:PutBucketVersioning"
+        ]
+        Resource = "arn:aws:s3:::healthdiary-*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "transcribe:StartTranscriptionJob",
+          "transcribe:GetTranscriptionJob",
+          "transcribe:ListTranscriptionJobs"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+
+  tags = {
+    Name = "healthdiary-ec2-policy"
+  }
+}
+
+# Attach policy to role
+resource "aws_iam_role_policy_attachment" "healthdiary_ec2_policy" {
+  role       = aws_iam_role.healthdiary_ec2_role.name
+  policy_arn = aws_iam_policy.healthdiary_ec2_policy.arn
+}
+
+# Instance Profile
+resource "aws_iam_instance_profile" "healthdiary_ec2_profile" {
+  name = "healthdiary-ec2-profile"
+  role = aws_iam_role.healthdiary_ec2_role.name
+
+  tags = {
+    Name = "healthdiary-ec2-profile"
+  }
+}
+
 # User data script to install Docker and run the application
 locals {
   user_data = base64encode(templatefile("${path.module}/user_data.sh", {
@@ -112,12 +204,13 @@ resource "aws_instance" "web" {
   subnet_id              = data.aws_subnets.default.ids[0]
 
   associate_public_ip_address = true
+  iam_instance_profile        = aws_iam_instance_profile.healthdiary_ec2_profile.name
   
   user_data = local.user_data
 
   root_block_device {
     volume_type = "gp3"
-    volume_size = 8
+    volume_size = 20  # Increased for application data
     encrypted   = true
   }
 
