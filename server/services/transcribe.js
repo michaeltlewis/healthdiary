@@ -141,6 +141,8 @@ class TranscribeService {
         s3Key = url.pathname.substring(1); // Remove leading slash
       }
       
+      console.log(`Attempting to retrieve transcript from S3 key: ${s3Key}`);
+      
       // Get transcript from S3
       const s3Service = require('./s3');
       const transcriptJson = await s3Service.getFileContent(s3Key);
