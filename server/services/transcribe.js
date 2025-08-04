@@ -31,7 +31,6 @@ class TranscribeService {
       OutputKey: outputKey,
       Settings: {
         ShowSpeakerLabels: false,
-        MaxSpeakerLabels: 1,
         ShowAlternatives: false,
         VocabularyFilterMethod: 'mask', // Mask profanity
       },
