@@ -36,11 +36,9 @@ fi
 
 echo ""
 
-# Check if this is a local environment or if we need to deploy to remote
-if command -v docker >/dev/null 2>&1 && [ -f "docker-compose.yml" ]; then
-    # Local environment with Docker
-    echo "🔨 Rebuilding Docker image locally..."
-    docker build -t healthdiary-app .
+# Build Docker image
+echo "🔨 Rebuilding Docker image..."
+docker build -t healthdiary-app .
 
 if [ $? -eq 0 ]; then
     echo "✅ Docker image rebuilt successfully"
@@ -150,3 +148,5 @@ if [ -f "docker-compose.yml" ]; then
 else
     echo "   http://$(hostname -f 2>/dev/null || echo 'your-server-ip')"
 fi
+
+echo "✅ Update completed successfully!"
