@@ -15,6 +15,9 @@ const scheduler = require('./services/scheduler');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Trust proxy for nginx reverse proxy
+app.set('trust proxy', true);
+
 // Security middleware
 app.use(helmet());
 app.use(cors({

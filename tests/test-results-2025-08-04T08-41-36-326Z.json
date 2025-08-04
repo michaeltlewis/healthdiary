@@ -1,0 +1,180 @@
+{
+  "timestamp": "2025-08-04T08:41:36.326Z",
+  "baseUrl": "https://healthdiary-app.duckdns.org",
+  "testUser": {
+    "username": "testuser1754296890819",
+    "email": "test_1754296890819@example.com"
+  },
+  "results": [
+    {
+      "timestamp": "2025-08-04T08:41:30.820Z",
+      "type": "info",
+      "message": "🚀 Starting Health Diary System Integration Tests"
+    },
+    {
+      "timestamp": "2025-08-04T08:41:30.821Z",
+      "type": "info",
+      "message": "Base URL: https://healthdiary-app.duckdns.org"
+    },
+    {
+      "timestamp": "2025-08-04T08:41:30.821Z",
+      "type": "info",
+      "message": "============================================================"
+    },
+    {
+      "timestamp": "2025-08-04T08:41:30.821Z",
+      "type": "info",
+      "message": "Testing health check endpoint..."
+    },
+    {
+      "timestamp": "2025-08-04T08:41:30.941Z",
+      "type": "success",
+      "message": "✅ Health check passed - Status: healthy, Version: 1.0.0"
+    },
+    {
+      "timestamp": "2025-08-04T08:41:30.941Z",
+      "type": "info",
+      "message": ""
+    },
+    {
+      "timestamp": "2025-08-04T08:41:30.941Z",
+      "type": "info",
+      "message": "Testing user registration..."
+    },
+    {
+      "timestamp": "2025-08-04T08:41:30.941Z",
+      "type": "info",
+      "message": "Registration data: {\"username\":\"testuser1754296890819\",\"email\":\"test_1754296890819@example.com\",\"password\":\"TestPassword123\",\"interactionStyle\":\"friendly\",\"subjects\":[\"wellness\",\"mood\"]}"
+    },
+    {
+      "timestamp": "2025-08-04T08:41:31.351Z",
+      "type": "success",
+      "message": "✅ User registration successful - User ID: 32f6b588-1816-47f7-8567-78fca64be179"
+    },
+    {
+      "timestamp": "2025-08-04T08:41:31.351Z",
+      "type": "info",
+      "message": "   Username: testuser1754296890819, Email: test_1754296890819@example.com"
+    },
+    {
+      "timestamp": "2025-08-04T08:41:31.351Z",
+      "type": "info",
+      "message": ""
+    },
+    {
+      "timestamp": "2025-08-04T08:41:31.352Z",
+      "type": "info",
+      "message": "Testing user login..."
+    },
+    {
+      "timestamp": "2025-08-04T08:41:31.714Z",
+      "type": "success",
+      "message": "✅ User login successful - User ID: 32f6b588-1816-47f7-8567-78fca64be179"
+    },
+    {
+      "timestamp": "2025-08-04T08:41:31.714Z",
+      "type": "info",
+      "message": ""
+    },
+    {
+      "timestamp": "2025-08-04T08:41:31.714Z",
+      "type": "info",
+      "message": "Testing authenticated endpoint (/api/auth/me)..."
+    },
+    {
+      "timestamp": "2025-08-04T08:41:31.721Z",
+      "type": "success",
+      "message": "✅ Authentication check passed - User: testuser1754296890819"
+    },
+    {
+      "timestamp": "2025-08-04T08:41:31.721Z",
+      "type": "info",
+      "message": "   Subjects tracked: wellness, mood"
+    },
+    {
+      "timestamp": "2025-08-04T08:41:31.721Z",
+      "type": "info",
+      "message": ""
+    },
+    {
+      "timestamp": "2025-08-04T08:41:31.721Z",
+      "type": "info",
+      "message": "Testing audio upload..."
+    },
+    {
+      "timestamp": "2025-08-04T08:41:36.311Z",
+      "type": "success",
+      "message": "✅ Audio upload successful - Entry ID: 3c65f600-2293-4030-913a-d6c23284c412"
+    },
+    {
+      "timestamp": "2025-08-04T08:41:36.311Z",
+      "type": "info",
+      "message": "   Transcription Status: pending"
+    },
+    {
+      "timestamp": "2025-08-04T08:41:36.311Z",
+      "type": "info",
+      "message": "   Analysis Status: pending"
+    },
+    {
+      "timestamp": "2025-08-04T08:41:36.311Z",
+      "type": "info",
+      "message": ""
+    },
+    {
+      "timestamp": "2025-08-04T08:41:36.312Z",
+      "type": "info",
+      "message": "Testing diary entries retrieval..."
+    },
+    {
+      "timestamp": "2025-08-04T08:41:36.318Z",
+      "type": "success",
+      "message": "✅ Diary entries retrieved - Count: 1"
+    },
+    {
+      "timestamp": "2025-08-04T08:41:36.318Z",
+      "type": "info",
+      "message": "   Total entries: 1"
+    },
+    {
+      "timestamp": "2025-08-04T08:41:36.318Z",
+      "type": "info",
+      "message": ""
+    },
+    {
+      "timestamp": "2025-08-04T08:41:36.318Z",
+      "type": "info",
+      "message": "Testing processing status endpoint..."
+    },
+    {
+      "timestamp": "2025-08-04T08:41:36.325Z",
+      "type": "success",
+      "message": "✅ Processing status retrieved - Stats count: 1"
+    },
+    {
+      "timestamp": "2025-08-04T08:41:36.325Z",
+      "type": "info",
+      "message": "   Recent jobs: 0"
+    },
+    {
+      "timestamp": "2025-08-04T08:41:36.325Z",
+      "type": "info",
+      "message": ""
+    },
+    {
+      "timestamp": "2025-08-04T08:41:36.325Z",
+      "type": "info",
+      "message": "============================================================"
+    },
+    {
+      "timestamp": "2025-08-04T08:41:36.325Z",
+      "type": "info",
+      "message": "📊 Test Results: 7 passed, 0 failed"
+    },
+    {
+      "timestamp": "2025-08-04T08:41:36.325Z",
+      "type": "success",
+      "message": "🎉 All tests passed! System is functioning correctly."
+    }
+  ]
+}

@@ -7,9 +7,9 @@ echo "======================================"
 echo ""
 
 # Check if we're in the right directory
-if [ ! -f "Dockerfile" ] || [ ! -f "docker-start.sh" ]; then
+if [ ! -f "Dockerfile" ] || [ ! -d "terraform-simple" ]; then
     echo "❌ Error: This script should be run from the Health Diary application directory"
-    echo "   Expected files: Dockerfile, docker-start.sh"
+    echo "   Expected files: Dockerfile, terraform-simple/"
     exit 1
 fi
 
@@ -29,9 +29,11 @@ fi
 
 echo ""
 
-# Rebuild the Docker image
-echo "🔨 Rebuilding Docker image..."
-docker build -t healthdiary-app .
+# Check if this is a local environment or if we need to deploy to remote
+if command -v docker >/dev/null 2>&1 && [ -f "docker-compose.yml" ]; then
+    # Local environment with Docker
+    echo "🔨 Rebuilding Docker image locally..."
+    docker build -t healthdiary-app .
 
 if [ $? -eq 0 ]; then
     echo "✅ Docker image rebuilt successfully"

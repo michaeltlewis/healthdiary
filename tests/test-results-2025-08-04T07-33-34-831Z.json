@@ -1,0 +1,150 @@
+{
+  "timestamp": "2025-08-04T07:33:34.831Z",
+  "baseUrl": "https://healthdiary-app.duckdns.org",
+  "testUser": {
+    "username": "testuser_1754292814670",
+    "email": "test_1754292814670@example.com"
+  },
+  "results": [
+    {
+      "timestamp": "2025-08-04T07:33:34.670Z",
+      "type": "info",
+      "message": "🚀 Starting Health Diary System Integration Tests"
+    },
+    {
+      "timestamp": "2025-08-04T07:33:34.673Z",
+      "type": "info",
+      "message": "Base URL: https://healthdiary-app.duckdns.org"
+    },
+    {
+      "timestamp": "2025-08-04T07:33:34.673Z",
+      "type": "info",
+      "message": "============================================================"
+    },
+    {
+      "timestamp": "2025-08-04T07:33:34.673Z",
+      "type": "info",
+      "message": "Testing health check endpoint..."
+    },
+    {
+      "timestamp": "2025-08-04T07:33:34.806Z",
+      "type": "success",
+      "message": "✅ Health check passed - Status: healthy, Version: 1.0.0"
+    },
+    {
+      "timestamp": "2025-08-04T07:33:34.806Z",
+      "type": "info",
+      "message": ""
+    },
+    {
+      "timestamp": "2025-08-04T07:33:34.806Z",
+      "type": "info",
+      "message": "Testing user registration..."
+    },
+    {
+      "timestamp": "2025-08-04T07:33:34.806Z",
+      "type": "info",
+      "message": "Registration data: {\"username\":\"testuser_1754292814670\",\"email\":\"test_1754292814670@example.com\",\"password\":\"TestPassword123\",\"interactionStyle\":\"friendly\",\"subjects\":[\"wellness\",\"mood\"]}"
+    },
+    {
+      "timestamp": "2025-08-04T07:33:34.816Z",
+      "type": "error",
+      "message": "❌ User registration failed - Status: 400, Error: Validation failed"
+    },
+    {
+      "timestamp": "2025-08-04T07:33:34.817Z",
+      "type": "info",
+      "message": ""
+    },
+    {
+      "timestamp": "2025-08-04T07:33:34.817Z",
+      "type": "info",
+      "message": "Testing user login..."
+    },
+    {
+      "timestamp": "2025-08-04T07:33:34.822Z",
+      "type": "error",
+      "message": "❌ User login failed - Status: 401, Error: Invalid email or password"
+    },
+    {
+      "timestamp": "2025-08-04T07:33:34.822Z",
+      "type": "info",
+      "message": ""
+    },
+    {
+      "timestamp": "2025-08-04T07:33:34.822Z",
+      "type": "info",
+      "message": "Testing authenticated endpoint (/api/auth/me)..."
+    },
+    {
+      "timestamp": "2025-08-04T07:33:34.828Z",
+      "type": "error",
+      "message": "❌ Authentication check failed - Status: 401"
+    },
+    {
+      "timestamp": "2025-08-04T07:33:34.829Z",
+      "type": "info",
+      "message": ""
+    },
+    {
+      "timestamp": "2025-08-04T07:33:34.831Z",
+      "type": "info",
+      "message": "Testing audio upload..."
+    },
+    {
+      "timestamp": "2025-08-04T07:33:34.831Z",
+      "type": "error",
+      "message": "❌ Audio upload test skipped - no auth token available"
+    },
+    {
+      "timestamp": "2025-08-04T07:33:34.831Z",
+      "type": "info",
+      "message": ""
+    },
+    {
+      "timestamp": "2025-08-04T07:33:34.831Z",
+      "type": "info",
+      "message": "Testing diary entries retrieval..."
+    },
+    {
+      "timestamp": "2025-08-04T07:33:34.831Z",
+      "type": "error",
+      "message": "❌ Diary entries test skipped - no auth token available"
+    },
+    {
+      "timestamp": "2025-08-04T07:33:34.831Z",
+      "type": "info",
+      "message": ""
+    },
+    {
+      "timestamp": "2025-08-04T07:33:34.831Z",
+      "type": "info",
+      "message": "Testing processing status endpoint..."
+    },
+    {
+      "timestamp": "2025-08-04T07:33:34.831Z",
+      "type": "error",
+      "message": "❌ Processing status test skipped - no auth token available"
+    },
+    {
+      "timestamp": "2025-08-04T07:33:34.831Z",
+      "type": "info",
+      "message": ""
+    },
+    {
+      "timestamp": "2025-08-04T07:33:34.831Z",
+      "type": "info",
+      "message": "============================================================"
+    },
+    {
+      "timestamp": "2025-08-04T07:33:34.831Z",
+      "type": "info",
+      "message": "📊 Test Results: 1 passed, 6 failed"
+    },
+    {
+      "timestamp": "2025-08-04T07:33:34.831Z",
+      "type": "warn",
+      "message": "⚠️  6 test(s) failed. Please review the errors above."
+    }
+  ]
+}

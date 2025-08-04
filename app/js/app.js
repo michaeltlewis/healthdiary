@@ -16,6 +16,7 @@ class HealthDiaryApp {
     
     init() {
         this.setupEventListeners();
+        this.initAudioContext();
         this.checkAuthStatus();
     }
     
@@ -207,32 +208,50 @@ class HealthDiaryApp {
     }
     
     async startRecording() {
+        console.log('startRecording called');
         try {
+            console.log('Requesting microphone access');
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            console.log('Microphone access granted, stream:', stream);
             
             // Reset audio chunks
             this.audioChunks = [];
             
-            // Use compatible options for different browsers
+            // Use compatible options with priority for Android compatibility
             const options = {};
-            if (MediaRecorder.isTypeSupported('audio/mp4')) {
-                options.mimeType = 'audio/mp4';
+            
+            // Check for Android-compatible formats first
+            if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+                options.mimeType = 'audio/webm;codecs=opus';
+            } else if (MediaRecorder.isTypeSupported('audio/mp4;codecs=mp4a.40.2')) {
+                options.mimeType = 'audio/mp4;codecs=mp4a.40.2';
             } else if (MediaRecorder.isTypeSupported('audio/webm')) {
                 options.mimeType = 'audio/webm';
+            } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+                options.mimeType = 'audio/mp4';
+            } else if (MediaRecorder.isTypeSupported('audio/ogg;codecs=opus')) {
+                options.mimeType = 'audio/ogg;codecs=opus';
             } else if (MediaRecorder.isTypeSupported('audio/wav')) {
                 options.mimeType = 'audio/wav';
             }
             
+            console.log('Selected MIME type:', options.mimeType || 'default');
+            console.log('Supported MIME types:', MediaRecorder.getSupportedMimeTypes?.() || 'getSupportedMimeTypes not available');
+            
             this.mediaRecorder = new MediaRecorder(stream, options);
+            console.log('MediaRecorder created');
             
             this.mediaRecorder.ondataavailable = (event) => {
+                console.log('Data available event, size:', event.data.size);
                 this.audioChunks.push(event.data);
             };
             
             this.mediaRecorder.onstop = () => {
+                console.log('MediaRecorder stopped');
                 this.handleRecordingComplete();
             };
             
+            console.log('Starting MediaRecorder');
             this.mediaRecorder.start();
             
             // Update UI
@@ -245,6 +264,7 @@ class HealthDiaryApp {
             
         } catch (error) {
             console.error('Error starting recording:', error);
+            console.error('Error details:', error.name, error.message);
             this.showRecordingStatus('Error: Could not access microphone. Please check permissions.', 'error');
         }
     }
@@ -264,9 +284,17 @@ class HealthDiaryApp {
     }
     
     handleRecordingComplete() {
+        console.log('handleRecordingComplete called');
+        console.log('Audio chunks count:', this.audioChunks.length);
+        const totalSize = this.audioChunks.reduce((total, chunk) => total + chunk.size, 0);
+        console.log('Total audio data size:', totalSize, 'bytes');
+        
         const mimeType = this.mediaRecorder.mimeType || 'audio/wav';
+        console.log('Final MIME type:', mimeType);
+        
         const audioBlob = new Blob(this.audioChunks, { type: mimeType });
         const audioUrl = URL.createObjectURL(audioBlob);
+        console.log('Audio blob created, size:', audioBlob.size, 'type:', audioBlob.type);
         
         this.currentRecording = {
             blob: audioBlob,
@@ -274,21 +302,109 @@ class HealthDiaryApp {
             mimeType: mimeType
         };
         
-        // Set up audio player
+        console.log('Current recording stored:', this.currentRecording);
+        
+        // Set up audio player with enhanced mobile compatibility
         const audioPlayer = document.getElementById('audioPlayer');
         audioPlayer.src = audioUrl;
-        audioPlayer.preload = 'auto';
+        audioPlayer.preload = 'metadata';
+        
+        // Enhanced mobile-friendly attributes
+        audioPlayer.setAttribute('playsinline', 'true');
+        audioPlayer.setAttribute('webkit-playsinline', 'true');
+        audioPlayer.setAttribute('controlslist', 'nodownload');
+        audioPlayer.setAttribute('disablepictureinpicture', 'true');
+        
+        // Mobile-specific audio setup
+        audioPlayer.style.width = '100%';
+        audioPlayer.style.maxWidth = '400px';
+        audioPlayer.style.height = '54px'; // Increased for better mobile touch targets
+        
+        // Initialize audio context for iOS if needed
+        this.initAudioContext();
+        
+        // Force load the audio and handle mobile quirks
+        audioPlayer.load();
+        
+        // Add mobile-specific event listeners
+        const handleAudioReady = () => {
+            console.log('Audio ready for playback');
+            audioPlayer.removeEventListener('canplaythrough', handleAudioReady);
+        };
+        audioPlayer.addEventListener('canplaythrough', handleAudioReady);
         
         // Show controls
         document.getElementById('audioControls').classList.remove('hidden');
         
-        this.showRecordingStatus('Recording complete! Review and save to your diary.', 'success');
+        this.showRecordingStatus('Recording complete! Tap the audio player or Play button to listen.', 'success');
     }
     
     playRecording() {
         if (this.currentRecording) {
             const audioPlayer = document.getElementById('audioPlayer');
-            audioPlayer.play();
+            
+            // Enhanced mobile audio playback with better error handling
+            const playAudio = async () => {
+                try {
+                    // Reset the audio element for mobile compatibility
+                    audioPlayer.currentTime = 0;
+                    
+                    // For iOS: attempt to unlock audio context if needed
+                    if (window.AudioContext || window.webkitAudioContext) {
+                        const AudioContext = window.AudioContext || window.webkitAudioContext;
+                        if (this.audioContext && this.audioContext.state === 'suspended') {
+                            await this.audioContext.resume();
+                        }
+                    }
+                    
+                    // Force load the audio data
+                    audioPlayer.load();
+                    
+                    // Wait for audio to be ready
+                    await new Promise((resolve, reject) => {
+                        const onCanPlay = () => {
+                            audioPlayer.removeEventListener('canplay', onCanPlay);
+                            audioPlayer.removeEventListener('error', onError);
+                            resolve();
+                        };
+                        const onError = () => {
+                            audioPlayer.removeEventListener('canplay', onCanPlay);
+                            audioPlayer.removeEventListener('error', onError);
+                            reject(new Error('Audio loading failed'));
+                        };
+                        
+                        if (audioPlayer.readyState >= 3) {
+                            resolve(); // Already ready
+                        } else {
+                            audioPlayer.addEventListener('canplay', onCanPlay);
+                            audioPlayer.addEventListener('error', onError);
+                        }
+                    });
+                    
+                    // Attempt to play
+                    await audioPlayer.play();
+                    console.log('Audio playback started successfully');
+                    
+                } catch (error) {
+                    console.error('Audio playback failed:', error);
+                    
+                    // Enhanced fallback strategies for mobile
+                    this.showMessage('Tap the audio player controls below to play your recording', 'warning');
+                    
+                    // Make the built-in controls more prominent
+                    audioPlayer.style.border = '2px solid var(--primary-color)';
+                    audioPlayer.style.borderRadius = '8px';
+                    audioPlayer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                    // Remove border after a few seconds
+                    setTimeout(() => {
+                        audioPlayer.style.border = '';
+                        audioPlayer.style.borderRadius = '';
+                    }, 3000);
+                }
+            };
+            
+            playAudio();
         }
     }
     
@@ -303,7 +419,14 @@ class HealthDiaryApp {
     }
     
     async uploadRecording() {
-        if (!this.currentRecording) return;
+        console.log('uploadRecording called');
+        if (!this.currentRecording) {
+            console.error('No current recording found');
+            return;
+        }
+        
+        console.log('Current recording blob size:', this.currentRecording.blob.size);
+        console.log('Current recording blob type:', this.currentRecording.blob.type);
         
         const btn = document.getElementById('uploadBtn');
         this.setLoading(btn, true);
@@ -313,6 +436,9 @@ class HealthDiaryApp {
             formData.append('audio', this.currentRecording.blob);
             formData.append('entryDate', new Date().toISOString());
             
+            console.log('FormData created, making API call to:', `${this.apiBase}/diary/upload`);
+            console.log('Auth token present:', !!this.authToken);
+            
             const response = await fetch(`${this.apiBase}/diary/upload`, {
                 method: 'POST',
                 headers: {
@@ -321,12 +447,23 @@ class HealthDiaryApp {
                 body: formData
             });
             
+            console.log('Response status:', response.status);
+            console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+            
             if (!response.ok) {
-                const error = await response.json();
+                const errorText = await response.text();
+                console.error('Response error text:', errorText);
+                let error;
+                try {
+                    error = JSON.parse(errorText);
+                } catch (e) {
+                    error = { error: errorText };
+                }
                 throw new Error(error.error || 'Upload failed');
             }
             
             const result = await response.json();
+            console.log('Upload result:', result);
             
             this.showMessage('Recording uploaded successfully! Processing transcription...', 'success');
             this.discardRecording();
@@ -334,6 +471,7 @@ class HealthDiaryApp {
             
         } catch (error) {
             console.error('Upload error:', error);
+            console.error('Error stack:', error.stack);
             this.showMessage(error.message || 'Failed to upload recording', 'error');
         } finally {
             this.setLoading(btn, false);
@@ -487,12 +625,20 @@ class HealthDiaryApp {
             content += `
                 <div style="margin-bottom: 20px;">
                     <h4>Audio Recording</h4>
-                    <audio controls style="width: 100%;">
-                        <source src="${entry.audioDownloadUrl}" type="audio/mp4">
-                        <source src="${entry.audioDownloadUrl}" type="audio/webm">
-                        <source src="${entry.audioDownloadUrl}" type="audio/wav">
-                        Your browser does not support the audio element.
-                    </audio>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                        <audio controls playsinline webkit-playsinline preload="metadata" 
+                               controlslist="nodownload" disablepictureinpicture
+                               style="width: 100%; height: 54px; border-radius: 6px;">
+                            <source src="${entry.audioDownloadUrl}" type="audio/mp4">
+                            <source src="${entry.audioDownloadUrl}" type="audio/webm">
+                            <source src="${entry.audioDownloadUrl}" type="audio/ogg">
+                            <source src="${entry.audioDownloadUrl}" type="audio/wav">
+                            Your browser does not support the audio element.
+                        </audio>
+                        <div style="margin-top: 8px; font-size: 0.85em; color: #666; text-align: center;">
+                            🎧 Tap the play button to listen to your recording
+                        </div>
+                    </div>
                 </div>
             `;
         }
@@ -678,6 +824,39 @@ class HealthDiaryApp {
             'audio/ogg': 'ogg'
         };
         return typeMap[mimeType] || 'bin';
+    }
+    
+    initAudioContext() {
+        // Initialize audio context for iOS Safari compatibility
+        if (typeof window !== 'undefined' && (window.AudioContext || window.webkitAudioContext)) {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!this.audioContext) {
+                    this.audioContext = new AudioContext();
+                }
+                
+                // Handle iOS audio context unlock on first user interaction
+                const unlockAudio = () => {
+                    if (this.audioContext && this.audioContext.state === 'suspended') {
+                        this.audioContext.resume().then(() => {
+                            console.log('Audio context unlocked');
+                        }).catch(err => {
+                            console.warn('Failed to unlock audio context:', err);
+                        });
+                    }
+                    // Remove listener after first successful unlock attempt
+                    document.removeEventListener('touchstart', unlockAudio);
+                    document.removeEventListener('click', unlockAudio);
+                };
+                
+                // Add listeners for user interaction to unlock audio
+                document.addEventListener('touchstart', unlockAudio, { once: true });
+                document.addEventListener('click', unlockAudio, { once: true });
+                
+            } catch (error) {
+                console.warn('AudioContext initialization failed:', error);
+            }
+        }
     }
 }
 

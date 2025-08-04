@@ -34,13 +34,27 @@ const createEntrySchema = Joi.object({
 
 // Upload audio and create diary entry
 router.post('/upload', attachUserDetails, upload.single('audio'), async (req, res) => {
+  console.log('=== DIARY UPLOAD REQUEST START ===');
+  console.log('User ID:', req.user?.id);
+  console.log('File present:', !!req.file);
+  console.log('File details:', req.file ? {
+    fieldname: req.file.fieldname,
+    originalname: req.file.originalname,
+    mimetype: req.file.mimetype,
+    size: req.file.size
+  } : 'No file');
+  console.log('Request body:', req.body);
+  
   try {
     if (!req.file) {
+      console.log('ERROR: No audio file provided');
       return res.status(400).json({ error: 'Audio file is required' });
     }
     
+    console.log('Validating request data...');
     const { error, value } = createEntrySchema.validate(req.body);
     if (error) {
+      console.log('Validation error:', error.details);
       return res.status(400).json({ 
         error: 'Validation failed', 
         details: error.details.map(d => d.message) 
@@ -51,14 +65,19 @@ router.post('/upload', attachUserDetails, upload.single('audio'), async (req, re
     const userId = req.user.id;
     const entryId = uuidv4();
     
+    console.log('Processing upload:', { entryId, userId, entryDate, fileSize: req.file.size });
+    
     // Upload audio to S3
+    console.log('Uploading to S3...');
     const audioUpload = await s3Service.uploadAudioFile(
       userId,
       req.file.buffer,
       req.file.mimetype
     );
+    console.log('S3 upload successful:', audioUpload);
     
     // Create diary entry in database
+    console.log('Creating database entry...');
     const db = getDatabase();
     await new Promise((resolve, reject) => {
       db.run(
@@ -66,8 +85,13 @@ router.post('/upload', attachUserDetails, upload.single('audio'), async (req, re
          VALUES (?, ?, ?, ?, 'pending', 'pending')`,
         [entryId, userId, entryDate, audioUpload.key],
         function(err) {
-          if (err) reject(err);
-          else resolve(this);
+          if (err) {
+            console.log('Database insert error:', err);
+            reject(err);
+          } else {
+            console.log('Database entry created successfully');
+            resolve(this);
+          }
         }
       );
     });

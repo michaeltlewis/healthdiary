@@ -546,12 +546,24 @@
                 <div id="recordingStatus" class="status-message hidden"></div>
                 
                 <div id="audioControls" class="hidden" style="margin-top: 20px;">
-                    <audio id="audioPlayer" controls style="width: 100%; max-width: 400px;"></audio>
-                    <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                        <button id="playBtn" class="btn btn-success">▶️ Play</button>
-                        <button id="downloadBtn" class="btn btn-primary">💾 Download</button>
-                        <button id="uploadBtn" class="btn btn-primary">📤 Save to Diary</button>
-                        <button id="discardBtn" class="btn btn-outline">🗑️ Discard</button>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <audio id="audioPlayer" controls playsinline webkit-playsinline 
+                               preload="metadata" controlslist="nodownload" disablepictureinpicture
+                               style="width: 100%; max-width: 400px; height: 54px; border-radius: 6px;">
+                            Your browser does not support the audio element.
+                        </audio>
+                        <div style="margin-top: 8px; font-size: 0.85em; color: #666; text-align: center;">
+                            🎧 Use the audio controls above to play your recording
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                        <button id="playBtn" class="btn btn-success" style="min-height: 48px;">▶️ Play</button>
+                        <button id="downloadBtn" class="btn btn-primary" style="min-height: 48px;">💾 Download</button>
+                        <button id="uploadBtn" class="btn btn-primary" style="min-height: 48px;">📤 Save to Diary</button>
+                        <button id="discardBtn" class="btn btn-outline" style="min-height: 48px;">🗑️ Discard</button>
+                    </div>
+                    <div style="margin-top: 12px; font-size: 0.9em; color: #666; text-align: center;">
+                        💡 For best mobile experience, use the built-in audio player controls
                     </div>
                 </div>
             </div>
