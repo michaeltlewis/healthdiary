@@ -2,8 +2,15 @@
 
 set -e
 
+# Parse command line arguments
+BRANCH_NAME="main"
+if [ $# -gt 0 ]; then
+    BRANCH_NAME="$1"
+fi
+
 echo "Health Diary Application Update Script"
 echo "======================================"
+echo "📋 Branch: $BRANCH_NAME"
 echo ""
 
 # Check if we're in the right directory
@@ -17,8 +24,8 @@ echo "📂 Current directory: $(pwd)"
 echo ""
 
 # Pull latest code from GitHub
-echo "📥 Pulling latest code from GitHub..."
-git pull origin main
+echo "📥 Pulling latest code from GitHub (branch: $BRANCH_NAME)..."
+git pull origin "$BRANCH_NAME"
 
 if [ $? -eq 0 ]; then
     echo "✅ Code updated successfully"
