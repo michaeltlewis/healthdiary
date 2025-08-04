@@ -10,7 +10,7 @@ AWS.config.update({
 });
 
 const transcribe = new AWS.TranscribeService();
-const BUCKET_NAME = process.env.S3_BUCKET_NAME || 'healthdiary-audio-files';
+const BUCKET_NAME = process.env.S3_BUCKET_NAME || 'healthdiary--audio';
 
 class TranscribeService {
   /**
