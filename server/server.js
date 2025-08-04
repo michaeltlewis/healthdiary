@@ -19,7 +19,21 @@ const PORT = process.env.PORT || 3000;
 app.set('trust proxy', true);
 
 // Security middleware
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
+      mediaSrc: ["'self'", "https://*.s3.eu-west-2.amazonaws.com", "https://healthdiary--audio.s3.eu-west-2.amazonaws.com"],
+      connectSrc: ["'self'"],
+      fontSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      frameSrc: ["'none'"]
+    }
+  }
+}));
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:8080',
   credentials: true
