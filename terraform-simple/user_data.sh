@@ -220,8 +220,8 @@ docker build -t healthdiary-app .
 # Check if using SSL (docker-compose) or HTTP-only
 if [ -f "docker-compose.yml" ]; then
     echo "Updating with SSL support..."
-    docker-compose down
-    docker-compose up -d
+    /usr/local/bin/docker-compose down
+    /usr/local/bin/docker-compose up -d
     echo "Application updated with SSL support"
 else
     echo "Updating HTTP-only deployment..."
