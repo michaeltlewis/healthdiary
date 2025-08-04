@@ -32,8 +32,6 @@ class HealthDiaryApp {
         
         // Recording events
         document.getElementById('recordBtn').addEventListener('click', () => this.toggleRecording());
-        document.getElementById('playBtn').addEventListener('click', () => this.playRecording());
-        document.getElementById('uploadBtn').addEventListener('click', () => this.uploadRecording());
         document.getElementById('discardBtn').addEventListener('click', () => this.discardRecording());
         document.getElementById('downloadBtn').addEventListener('click', () => this.downloadRecording());
     }
@@ -195,19 +193,17 @@ class HealthDiaryApp {
         }
     }
     
-    handleRecordingComplete() {
+    async handleRecordingComplete() {
         const mimeType = this.mediaRecorder.mimeType || 'audio/webm';
         const audioBlob = new Blob(this.audioChunks, { type: mimeType });
         const audioUrl = URL.createObjectURL(audioBlob);
         
         this.currentRecording = { blob: audioBlob, url: audioUrl, mimeType };
         
-        const audioPlayer = document.getElementById('audioPlayer');
-        audioPlayer.src = audioUrl;
-        audioPlayer.load();
+        this.showRecordingStatus('Recording complete! Saving to diary...', 'warning');
         
-        document.getElementById('audioControls').classList.remove('hidden');
-        this.showRecordingStatus('Recording complete! You can now play, save, or discard it.', 'success');
+        // Auto-upload the recording
+        await this.uploadRecording();
     }
     
     playRecording() {
@@ -233,10 +229,6 @@ class HealthDiaryApp {
     async uploadRecording() {
         if (!this.currentRecording) return;
         
-        const btn = document.getElementById('uploadBtn');
-        btn.disabled = true;
-        btn.textContent = 'Saving...';
-        
         try {
             const formData = new FormData();
             formData.append('audio', this.currentRecording.blob);
@@ -253,16 +245,15 @@ class HealthDiaryApp {
                 throw new Error(error.error || 'Upload failed');
             }
             
-            this.showMessage('Recording saved successfully!');
+            this.showMessage('Recording saved to diary successfully!');
             this.discardRecording();
             await this.loadLatestEntry();
             
         } catch (error) {
             console.error('Upload error:', error);
             this.showMessage(error.message || 'Failed to save recording', 'error');
-        } finally {
-            btn.disabled = false;
-            btn.textContent = '📤 Save to Diary';
+            this.showRecordingStatus('Upload failed. You can download or discard the recording.', 'error');
+            document.getElementById('audioControls').classList.remove('hidden');
         }
     }
     
