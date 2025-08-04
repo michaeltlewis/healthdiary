@@ -37,6 +37,12 @@ else
     echo "✓ SSH public key found"
 fi
 
+# Auto-load .env file if it exists
+if [ -f "../.env" ]; then
+    echo "✓ Loading environment variables from .env file"
+    source ../.env
+fi
+
 # Check for Duck DNS configuration (optional)
 DUCKDNS_VARS=""
 if [ -n "$DUCKDNS_TOKEN" ] && [ -n "$DUCKDNS_SUBDOMAIN" ]; then
