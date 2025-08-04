@@ -138,7 +138,9 @@ class TranscribeService {
       } else {
         // Handle HTTPS URL format from AWS Transcribe
         const url = new URL(transcriptUri);
-        s3Key = url.pathname.substring(1); // Remove leading slash
+        // URL format: https://s3.region.amazonaws.com/bucket-name/key
+        // So pathname = /bucket-name/key, we need to remove /bucket-name/
+        s3Key = url.pathname.replace(`/${BUCKET_NAME}/`, '');
       }
       
       console.log(`Attempting to retrieve transcript from S3 key: ${s3Key}`);
