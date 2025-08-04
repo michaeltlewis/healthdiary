@@ -131,8 +131,15 @@ class TranscribeService {
    */
   async getTranscriptionResult(transcriptUri) {
     try {
-      // Extract S3 key from URI
-      const s3Key = transcriptUri.replace(`s3://${BUCKET_NAME}/`, '');
+      // Extract S3 key from URI (handle both s3:// and https:// formats)
+      let s3Key;
+      if (transcriptUri.startsWith('s3://')) {
+        s3Key = transcriptUri.replace(`s3://${BUCKET_NAME}/`, '');
+      } else {
+        // Handle HTTPS URL format from AWS Transcribe
+        const url = new URL(transcriptUri);
+        s3Key = url.pathname.substring(1); // Remove leading slash
+      }
       
       // Get transcript from S3
       const s3Service = require('./s3');
