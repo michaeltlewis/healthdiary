@@ -33,10 +33,6 @@ class TranscribeService {
         ShowSpeakerLabels: false,
         ShowAlternatives: false,
         VocabularyFilterMethod: 'mask', // Mask profanity
-      },
-      JobExecutionSettings: {
-        AllowDeferredExecution: false,
-        DataAccessRoleArn: null // Will use the EC2 instance role
       }
     };
     
