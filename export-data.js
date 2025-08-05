@@ -385,26 +385,38 @@ class DataExporter {
   }
 
   /**
-   * Save export to file
+   * Save export to file or stdout
    */
   async saveToFile(filename) {
     const jsonOutput = JSON.stringify(this.exportData, null, 2);
-    await fs.writeFile(filename, jsonOutput, 'utf8');
-    console.log(`Export saved to: ${filename}`);
+    
+    if (filename === '-' || !filename) {
+      // Output to stdout
+      console.log(jsonOutput);
+    } else {
+      // Save to file
+      await fs.writeFile(filename, jsonOutput, 'utf8');
+      console.error(`Export saved to: ${filename}`);
+    }
   }
 }
 
 // Main execution
 async function main() {
-  const outputFile = process.argv[2] || `health-diary-export-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
+  const outputFile = process.argv[2];
   
   try {
     const exporter = new DataExporter();
     await exporter.exportAll();
     await exporter.saveToFile(outputFile);
     
-    console.log('\n✅ Export completed successfully!');
-    console.log(`📄 Output file: ${outputFile}`);
+    if (outputFile && outputFile !== '-') {
+      console.error('\n✅ Export completed successfully!');
+      console.error(`📄 Output file: ${outputFile}`);
+    } else {
+      // When outputting to stdout, send status messages to stderr
+      console.error('\n✅ Export completed successfully!');
+    }
     
   } catch (error) {
     console.error('\n❌ Export failed:', error);
