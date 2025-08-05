@@ -51,7 +51,7 @@ class DataExporter {
           console.error('Error opening database:', err);
           reject(err);
         } else {
-          console.log('Connected to SQLite database');
+          console.error('Connected to SQLite database');
           resolve();
         }
       });
@@ -147,7 +147,7 @@ class DataExporter {
    */
   async getS3FileContent(s3Key) {
     try {
-      console.log(`Retrieving S3 file: ${s3Key}`);
+      console.error(`Retrieving S3 file: ${s3Key}`);
       const params = {
         Bucket: S3_BUCKET_NAME,
         Key: s3Key
@@ -244,7 +244,7 @@ class DataExporter {
    * Process a single diary entry
    */
   async processDiaryEntry(entry) {
-    console.log(`Processing diary entry: ${entry.id}`);
+    console.error(`Processing diary entry: ${entry.id}`);
     
     const processedEntry = {
       id: entry.id,
@@ -288,7 +288,7 @@ class DataExporter {
    * Process a single user
    */
   async processUser(user) {
-    console.log(`Processing user: ${user.username} (${user.id})`);
+    console.error(`Processing user: ${user.username} (${user.id})`);
     
     const processedUser = {
       id: user.id,
@@ -351,13 +351,13 @@ class DataExporter {
    */
   async exportAll() {
     try {
-      console.log('Starting Health Diary data export...');
+      console.error('Starting Health Diary data export...');
       
       await this.openDatabase();
       
       // Get all users
       const users = await this.getUsers();
-      console.log(`Found ${users.length} users`);
+      console.error(`Found ${users.length} users`);
 
       // Process each user
       for (const user of users) {
@@ -370,10 +370,10 @@ class DataExporter {
 
       this.closeDatabase();
       
-      console.log('Export completed successfully');
-      console.log(`Summary: ${this.exportData.summary.totalUsers} users, ${this.exportData.summary.totalEntries} entries`);
-      console.log(`Transcription rate: ${this.exportData.summary.completionRate.transcription}%`);
-      console.log(`Analysis rate: ${this.exportData.summary.completionRate.analysis}%`);
+      console.error('Export completed successfully');
+      console.error(`Summary: ${this.exportData.summary.totalUsers} users, ${this.exportData.summary.totalEntries} entries`);
+      console.error(`Transcription rate: ${this.exportData.summary.completionRate.transcription}%`);
+      console.error(`Analysis rate: ${this.exportData.summary.completionRate.analysis}%`);
       
       return this.exportData;
       
