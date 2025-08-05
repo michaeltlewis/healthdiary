@@ -16,6 +16,10 @@ COPY server/ ./server/
 # Copy frontend files
 COPY app/ ./app/
 
+# Copy export script
+COPY export-data.js ./
+RUN chmod +x export-data.js
+
 # Create data directory for SQLite database
 RUN mkdir -p server/data
 
